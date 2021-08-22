@@ -1,0 +1,45 @@
+#button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  font-size: 14px;
+  background: $primary-blue;
+  color: $white;
+  width: max-content;
+  cursor: pointer;
+  font-weight: 700;
+  border: 1px solid;
+
+  &.disabled {
+    opacity: .5;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  &.white {
+    background: $white;
+    color: $primary-blue;
+  }
+
+  &.danger {
+    background: $white;
+    color: $danger;
+    border-color: $danger;
+  }
+
+  &.small {
+    padding: 4px 8px;
+    height: 32px;
+  }
+
+  &.normal {
+    padding: 4px 16px;
+    height: 37px;
+  }
+
+  &.large {
+    padding: 8px 16px;
+    height: 42px;
+  }
+}

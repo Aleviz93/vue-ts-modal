@@ -1,0 +1,55 @@
+stages:
+  - build_frontend
+  - build_nginx
+  - deploy
+
+# build:nginx:
+#   # image: docker:stable
+#   stage: build_nginx
+#   tags:
+#     - shell
+#   retry: 2
+#   # services:
+#   #   - docker:dind
+#   before_script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#   script:
+#     - docker build . -f docker/dev/Dockerfile_nginx --cache-from $CI_REGISTRY_IMAGE/nginx:latest -t $CI_REGISTRY_IMAGE/nginx:$CI_PIPELINE_ID -t $CI_REGISTRY_IMAGE/nginx:latest
+#     - docker push $CI_REGISTRY_IMAGE/nginx --all-tags
+#   only:
+#     - develop
+
+build:frontend:
+  # image: docker:stable
+  stage: build_frontend
+  tags:
+    - shell
+  retry: 2
+  # services:
+  #   - docker:dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build . -f docker/dev/Dockerfile_frontend --cache-from $CI_REGISTRY_IMAGE/frontend:latest -t $CI_REGISTRY_IMAGE/frontend:$CI_PIPELINE_ID -t $CI_REGISTRY_IMAGE/frontend:latest
+    - docker push $CI_REGISTRY_IMAGE/frontend --all-tags
+  only:
+    refs:
+      - develop
+    changes:
+      - "public/**/*"
+      - "src/**/*"
+      - "*.json"
+      - "*.js"
+      - "docker/**/*"
+      
+run:playbook:
+  # image: registry.gitlab.com/torese/docker-ansible
+  stage: deploy
+  tags:
+    - shell
+  before_script:
+    - cat $PROJECT_ENV > .env
+  script:
+    - ansible-playbook -i ansible/hosts ansible/playbook.yaml
+  only:
+    - develop
